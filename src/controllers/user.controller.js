@@ -40,8 +40,8 @@ if (existedUser) {
     throw new ApiError(409,"User already actived in same user name or email");
     
 }
-const avatarLocalPath=await req.files?.avatar[0]?.path
-const coverImageLocalPath=await req.files?.coverImage[0]?.path
+const avatarLocalPath= req.files?.avatar[0]?.path
+const coverImageLocalPath= req.files?.coverImage[0]?.path
 
 
 
