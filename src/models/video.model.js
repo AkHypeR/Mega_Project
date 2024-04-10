@@ -26,7 +26,7 @@ const videoSchema =new mongoose.Schema({
         trim:true,
         index:true,
     },
-    avater:{
+    avatar:{
         type:String, //cloudinary url
         required: true,
     },
