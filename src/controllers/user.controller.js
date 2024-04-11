@@ -14,8 +14,8 @@ import {ApiResponce} from '../utils/ApiResponce.js'
 const generateAccessAndRefereshTokens = async(userId) =>{
     try {
         const user = await User.findById(userId)
-        const accessToken = user.generateaccessToken()
-        const refreshToken = user.generaterefreshToken()
+        const accessToken = user.generateAccessToken ()
+        const refreshToken = user.generateRefreshToken ()
 
         user.refreshToken = refreshToken
         await user.save({ validateBeforeSave: false })
@@ -168,7 +168,7 @@ const loginUser=asynchandler(async (req,res) => {
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken, options)
     .json(
-        new ApiResponse(
+        new ApiResponce(
             200, 
             {
                 user: loggedInUser, accessToken, refreshToken
