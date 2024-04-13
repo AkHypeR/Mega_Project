@@ -8,7 +8,7 @@ import {User} from '../models/user.model.js'
 
 import {ApiResponce} from '../utils/ApiResponce.js'
 
-
+import jsonwebtoken from "jsonwebtoken";
 
 
 const generateAccessAndRefereshTokens = async(userId) =>{
@@ -212,8 +212,54 @@ const logOut=asynchandler(async (req, res) => {
 
 })
 
+const refreshAccessToken=asynchandler(async (req, res) => {
+
+
+   const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
+   if(!incomingRefreshToken){
+    throw new ApiError(404,"Refresh token not available")
+   }
+   try {
+   const decodedToken = jsonwebtoken.verify(incomingRefreshToken,process.env.REFRESH_TOKEN_SECRET)
+   const user= await User.findById(decodedToken?._id)
+   if (!user) {
+    throw new ApiError(401,"Invalid refresh token")
+   }
+    if (incomingRefreshToken !==user?.refreshToken) {
+     throw new ApiError(401,"Refresh token is expired or used") 
+   }
+
+   const options={
+    httpOnly: true,
+    secure: true,
+   }
+
+  const {newaccessToken,newrefreshToken}= await generateAccessAndRefereshTokens(user._id)
+
+  return res
+  .status(200)
+  .cookie("accessToken",newaccessToken,options)
+  .cookie("rrefreshToken",newrefreshToken,options)
+  .json(
+    new ApiResponce(
+        200,
+        {accessToken:newaccessToken,
+         refreshToken:   newrefreshToken},
+            "Access Token created successfully"
+    )
+  )
+
+
+    //accessToken
+} catch (error) {
+    throw new ApiError(401,error?.message||"Invalid refresh token")
+    
+}
 
 
 
+})
 
-export{registerUser,loginUser,logOut}
+
+
+export{registerUser,loginUser,logOut,refreshAccessToken}
